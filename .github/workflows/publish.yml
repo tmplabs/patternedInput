@@ -2,12 +2,46 @@ name: Publish to pub.dev
 
 on:
   push:
-    branches: [ main ]
+    branches: 
+      - main
+      - dev
+  pull_request:
+    branches:
+      - main
+      - dev
   workflow_dispatch:
 
 
 jobs:
+  # Dry run for validation (runs on PRs and pushes)
+  dry-run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: dart-lang/setup-dart@v1
+        with:
+          sdk: stable
+          
+      - name: Install dependencies
+        run: dart pub get
+        
+      - name: Run tests
+        run: dart test
+        
+      - name: Analyze code
+        run: dart analyze --fatal-infos
+        
+      - name: Check formatting
+        run: dart format --output=none --set-exit-if-changed .
+        
+      - name: Dry run publish
+        run: dart pub publish --dry-run
+
+  # Actual publish (only runs on main/dev branches, not PRs)
   publish:
+    if: github.event_name != 'pull_request'
+    needs: dry-run
     permissions:
       id-token: write # Required for authentication using OIDC
     uses: dart-lang/setup-dart/.github/workflows/publish.yml@v1
