@@ -109,18 +109,20 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
               const SizedBox(height: 20),
               PatternedInput(
-                length: 6,
-                patterns: [
-                  r'[0-9]',
-                  r'[0-9]',
-                  r'[0-9]',
-                  r'[0-9]',
-                  r'[a-z]',
-                  r'[a-z]',
+                pattern: const [
+                  InputType.digit,
+                  InputType.digit,
+                  InputType.digit,
+                  InputType.digit,
+                  InputType.alpha,
+                  InputType.alpha,
                 ],
-                error: _error,
-                hints: ['1', '2', '3', '4', 'a', 'b'],
-                onValid: _onValid,
+                onChanged: (value) {
+                  // Handle input changes
+                },
+                onComplete: (value) {
+                  _onValid(value);
+                },
               ),
               const SizedBox(height: 20),
               if (_result.isNotEmpty)
