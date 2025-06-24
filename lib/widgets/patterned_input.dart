@@ -1,32 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-enum InputType { // Types of input allowed in each field
+enum InputType {
+  // Types of input allowed in each field
   alpha, // Alphabetic characters only (A-Z, case-insensitive)
   digit, // Numeric characters only (0-9)
   alphanumeric, // Both alphabetic and numeric characters
 }
 
-class PatternedInput extends StatefulWidget { // Customizable pattern-driven input widget with intelligent validation
-  final List<InputType> pattern; // Pattern defining the type of input for each field
-  
-  final ValueChanged<String>? onChanged; // Callback triggered when any field value changes
-  
-  final ValueChanged<String>? onComplete; // Callback triggered when all fields are filled
-  
+class PatternedInput extends StatefulWidget {
+  // Customizable pattern-driven input widget with intelligent validation
+  final List<InputType>
+      pattern; // Pattern defining the type of input for each field
+
+  final ValueChanged<String>?
+      onChanged; // Callback triggered when any field value changes
+
+  final ValueChanged<String>?
+      onComplete; // Callback triggered when all fields are filled
+
   final InputDecoration? decoration; // Custom decoration for input fields
-  
+
   final TextStyle? textStyle; // Text style for input fields
-  
+
   final double spacing; // Spacing between input fields
-  
+
   final double fieldWidth; // Width of each input field
-  
+
   final double fieldHeight; // Height of each input field
-  
+
   final bool autoFocus; // Whether to auto-focus the first field
-  
-  final PatternedInputController? controller; // Controller to access the widget's state externally
+
+  final PatternedInputController?
+      controller; // Controller to access the widget's state externally
 
   const PatternedInput({
     super.key,
@@ -65,11 +71,10 @@ class _PatternedInputState extends State<PatternedInput> {
     );
     _focusNodes = List.generate(
       widget.pattern.length,
-      (index) => FocusNode()
-..addListener(() {}),
+      (index) => FocusNode()..addListener(() {}),
     );
     _values = List.filled(widget.pattern.length, '');
-    
+
     if (widget.autoFocus && widget.pattern.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _focusNodes[0].requestFocus();
@@ -88,7 +93,8 @@ class _PatternedInputState extends State<PatternedInput> {
     super.dispose();
   }
 
-  bool _isValidCharacter(String char, InputType type) { // Validates if a character is valid for the given input type
+  bool _isValidCharacter(String char, InputType type) {
+    // Validates if a character is valid for the given input type
     switch (type) {
       case InputType.alpha:
         return RegExp(r'^[A-Za-z]$').hasMatch(char);
@@ -99,26 +105,29 @@ class _PatternedInputState extends State<PatternedInput> {
     }
   }
 
-  void _handlePaste(String text, int startIndex) { // Handles paste operation with intelligent character distribution
+  void _handlePaste(String text, int startIndex) {
+    // Handles paste operation with intelligent character distribution
     if (text.isEmpty) return;
 
     List<String> newValues = List.from(_values);
     int textIndex = 0;
-    
-    for (int i = startIndex; i < widget.pattern.length; i++) { // Clear fields from start index onwards first
+
+    for (int i = startIndex; i < widget.pattern.length; i++) {
+      // Clear fields from start index onwards first
       newValues[i] = '';
       _controllers[i].clear();
     }
 
-    for (int fieldIndex = startIndex; // Distribute characters from the paste text 
-         fieldIndex < widget.pattern.length && textIndex < text.length; 
-         fieldIndex++) {
-      
+    for (int fieldIndex =
+            startIndex; // Distribute characters from the paste text
+        fieldIndex < widget.pattern.length && textIndex < text.length;
+        fieldIndex++) {
       // Find the next valid character for this field type
       while (textIndex < text.length) {
         String char = text[textIndex];
-        
-        if (_isValidCharacter(char, widget.pattern[fieldIndex])) { // Check if character is valid for current field type
+
+        if (_isValidCharacter(char, widget.pattern[fieldIndex])) {
+          // Check if character is valid for current field type
           newValues[fieldIndex] = char.toUpperCase();
           _controllers[fieldIndex].text = char.toUpperCase();
           textIndex++;
@@ -141,7 +150,7 @@ class _PatternedInputState extends State<PatternedInput> {
       }
       nextFocusIndex = i + 1;
     }
-    
+
     if (nextFocusIndex < widget.pattern.length) {
       _focusNodes[nextFocusIndex].requestFocus();
     } else if (widget.pattern.isNotEmpty) {
@@ -151,21 +160,24 @@ class _PatternedInputState extends State<PatternedInput> {
     _notifyCallbacks();
   }
 
-  void _onChanged(int index, String value) { // Handles individual character input
+  void _onChanged(int index, String value) {
+    // Handles individual character input
     if (value.length > 1) {
       _handlePaste(value, index); // Handle paste operation
       return;
     }
 
     if (value.isEmpty) {
-      setState(() { // Handle deletion
+      setState(() {
+        // Handle deletion
         _values[index] = '';
       });
       _notifyCallbacks();
       return;
     }
 
-    if (!_isValidCharacter(value, widget.pattern[index])) { // Validate single character input
+    if (!_isValidCharacter(value, widget.pattern[index])) {
+      // Validate single character input
       _controllers[index].text = _values[index]; // Reject invalid character
       _controllers[index].selection = TextSelection.fromPosition(
         TextPosition(offset: _values[index].length),
@@ -177,24 +189,27 @@ class _PatternedInputState extends State<PatternedInput> {
     setState(() {
       _values[index] = upperValue;
     });
-    
+
     _controllers[index].text = upperValue;
     _controllers[index].selection = TextSelection.fromPosition(
       TextPosition(offset: upperValue.length),
     );
 
-    if (index < widget.pattern.length - 1) { // Auto-focus next field
+    if (index < widget.pattern.length - 1) {
+      // Auto-focus next field
       _focusNodes[index + 1].requestFocus();
     }
 
     _notifyCallbacks();
   }
 
-  void _handleKeyEvent(int index, KeyEvent event) { // Handles backspace key press
+  void _handleKeyEvent(int index, KeyEvent event) {
+    // Handles backspace key press
     if (event is KeyDownEvent) {
       if (event.logicalKey == LogicalKeyboardKey.backspace) {
         if (_values[index].isEmpty && index > 0) {
-          _focusNodes[index - 1].requestFocus(); // Move to previous field and clear it
+          _focusNodes[index - 1]
+              .requestFocus(); // Move to previous field and clear it
           setState(() {
             _values[index - 1] = '';
           });
@@ -205,22 +220,25 @@ class _PatternedInputState extends State<PatternedInput> {
     }
   }
 
-  void _notifyCallbacks() { // Notifies callbacks about state changes
+  void _notifyCallbacks() {
+    // Notifies callbacks about state changes
     String currentValue = _values.join();
     widget.onChanged?.call(currentValue);
-    
+
     if (_values.every((v) => v.isNotEmpty)) {
       widget.onComplete?.call(currentValue);
     }
   }
 
-  void _refreshUI() { // Refreshes the UI (for controller access)
+  void _refreshUI() {
+    // Refreshes the UI (for controller access)
     if (mounted) {
       setState(() {});
     }
   }
 
-  TextInputType _getKeyboardType(InputType type) { // Gets keyboard type based on input type
+  TextInputType _getKeyboardType(InputType type) {
+    // Gets keyboard type based on input type
     switch (type) {
       case InputType.alpha:
         return TextInputType.text;
@@ -231,7 +249,8 @@ class _PatternedInputState extends State<PatternedInput> {
     }
   }
 
-  List<TextInputFormatter> _getInputFormatters(InputType type) { // Gets input formatters based on input type
+  List<TextInputFormatter> _getInputFormatters(InputType type) {
+    // Gets input formatters based on input type
     switch (type) {
       case InputType.alpha:
         return [FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z]'))];
@@ -262,17 +281,19 @@ class _PatternedInputState extends State<PatternedInput> {
               keyboardType: _getKeyboardType(widget.pattern[index]),
               inputFormatters: _getInputFormatters(widget.pattern[index]),
               textCapitalization: TextCapitalization.characters,
-              style: widget.textStyle ?? const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-              decoration: widget.decoration ?? InputDecoration(
-                counterText: '',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                contentPadding: const EdgeInsets.all(8),
-              ),
+              style: widget.textStyle ??
+                  const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+              decoration: widget.decoration ??
+                  InputDecoration(
+                    counterText: '',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    contentPadding: const EdgeInsets.all(8),
+                  ),
               onChanged: (value) => _onChanged(index, value),
             ),
           ),
@@ -282,24 +303,28 @@ class _PatternedInputState extends State<PatternedInput> {
   }
 }
 
-class PatternedInputController { // Controller class to interact with PatternedInput widget externally
+class PatternedInputController {
+  // Controller class to interact with PatternedInput widget externally
   _PatternedInputState? _state;
 
   void _attachState(_PatternedInputState state) {
     _state = state;
   }
 
-  String get value { // Gets the current value as a concatenated string
+  String get value {
+    // Gets the current value as a concatenated string
     return _state?._values.join() ?? '';
   }
 
-  bool get isValid { // Checks if all fields are filled with valid values
+  bool get isValid {
+    // Checks if all fields are filled with valid values
     return _state?._values.every((v) => v.isNotEmpty) ?? false;
   }
 
-  void clear() { // Clears all input fields
+  void clear() {
+    // Clears all input fields
     if (_state == null) return;
-    
+
     for (int i = 0; i < _state!._controllers.length; i++) {
       _state!._controllers[i].clear();
       _state!._values[i] = '';
@@ -308,12 +333,14 @@ class PatternedInputController { // Controller class to interact with PatternedI
     _state!._refreshUI();
   }
 
-  void setValue(String value) { // Sets the value programmatically
+  void setValue(String value) {
+    // Sets the value programmatically
     if (_state == null) return;
     _state!._handlePaste(value, 0);
   }
 
-  void focusField(int index) { // Focuses a specific field
+  void focusField(int index) {
+    // Focuses a specific field
     if (_state == null || index < 0 || index >= _state!._focusNodes.length) {
       return;
     }
