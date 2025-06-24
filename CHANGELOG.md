@@ -1,39 +1,28 @@
 # Changelog
 
-## [1.0.0+1] - 2024-03-19
+## [1.0.0] - 2024-06-24
 
 ### Added
-- Initial release of the PatternedInput widget
-- Support for custom patterns per character position
-- Individual character validation
-- Automatic focus management
-- Error message display
-- Custom keyboard types per position
-- Custom input formatters per position
+- Initial release of PatternedInput package
+- `PatternedInput` widget with pattern-driven input validation
+- Support for three input types: `alpha`, `digit`, and `alphanumeric`
+- Intelligent paste handling with automatic character distribution
+- Smart navigation between input fields with auto-focus
+- Real-time validation preventing invalid character input
+- `PatternedInputController` for programmatic widget control
+- Comprehensive customization options for styling and layout
+- Auto-conversion of lowercase letters to uppercase
+- Backspace handling for seamless field navigation
+- Complete test suite with comprehensive coverage
+- Example app demonstrating various use cases
+- Full documentation with API reference
 
 ### Features
-- Flexible pattern validation using regex
-- Single error message display below input
-- Automatic clearing of invalid input
-- Support for hints per character position
-- Callback for valid input completion
-- Backspace navigation between fields
-
-### Example Usage
-```dart
-PatternedInput(
-  length: 6,
-  patterns: [
-    r'[0-9]',
-    r'[0-9]',
-    r'[0-9]',
-    r'[0-9]',
-    r'[a-z]',
-    r'[a-z]',
-  ],
-  hints: ['0', '1', '2', '3', 'a', 'b'],
-  onValid: (value) {
-    print('Valid input: $value');
-  },
-)
-```
+- Pattern-based input validation
+- Automatic focus management
+- Intelligent paste operation handling
+- Customizable field dimensions and spacing
+- Flexible styling options
+- Controller-based programmatic access
+- Material Design integration
+- Accessibility support
