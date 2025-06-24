@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1] - 2024-06-24
+
+### Fixed
+- Fixed paste handling logic to properly distribute characters to matching field types instead of stopping at first invalid character
+- Removed unused `_currentFocusIndex` field to eliminate static analysis warnings
+- Fixed test imports to use relative paths instead of package imports
+
 ## [1.0.0] - 2024-06-24
 
 ### Added

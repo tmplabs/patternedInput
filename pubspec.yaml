@@ -1,6 +1,6 @@
-name: patterned_input
+name: patternedinput
 description: A customizable Flutter widget for pattern-driven input fields with intelligent paste handling, auto-navigation, and validation. Perfect for OTP, form codes, and structured data entry.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/tmplabs/patternedInput
 
 environment:
@@ -23,7 +23,5 @@ topics:
   - input
   - otp
   - form
-  - validation
   - widget
-  - pattern
   - ui

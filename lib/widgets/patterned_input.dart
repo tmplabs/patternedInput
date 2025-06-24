@@ -50,7 +50,6 @@ class _PatternedInputState extends State<PatternedInput> {
   late List<TextEditingController> _controllers;
   late List<FocusNode> _focusNodes;
   late List<String> _values;
-  int _currentFocusIndex = 0;
 
   @override
   void initState() {
@@ -67,11 +66,7 @@ class _PatternedInputState extends State<PatternedInput> {
     _focusNodes = List.generate(
       widget.pattern.length,
       (index) => FocusNode()
-        ..addListener(() {
-          if (_focusNodes[index].hasFocus) {
-            _currentFocusIndex = index;
-          }
-        }),
+..addListener(() {}),
     );
     _values = List.filled(widget.pattern.length, '');
     
