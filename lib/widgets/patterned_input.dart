@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-
 enum InputType {
   // Types of input allowed in each field
   alpha, // Alphabetic characters only (A-Z, case-insensitive)
@@ -113,11 +112,13 @@ class _PatternedInputState extends State<PatternedInput> {
     // Step 1: Validate if the string matches the expected pattern from startIndex
     List<String> validatedChars = [];
     int textIndex = 0;
-    
+
     // Pre-validate the string against the pattern starting from startIndex
-    for (int fieldIndex = startIndex; fieldIndex < widget.pattern.length && textIndex < text.length; fieldIndex++) {
+    for (int fieldIndex = startIndex;
+        fieldIndex < widget.pattern.length && textIndex < text.length;
+        fieldIndex++) {
       String? validChar;
-      
+
       // Look for a valid character for this field type in the remaining text
       while (textIndex < text.length) {
         String char = text[textIndex];
@@ -128,24 +129,24 @@ class _PatternedInputState extends State<PatternedInput> {
         }
         textIndex++; // Skip invalid character
       }
-      
+
       if (validChar != null) {
         validatedChars.add(validChar);
       } else {
         break; // No valid character found for this field, stop validation
       }
     }
-    
+
     // Step 2: If validation successful, distribute characters to fields
     if (validatedChars.isNotEmpty) {
       List<String> newValues = List.from(_values);
-      
+
       // Clear fields from start index onwards first
       for (int i = startIndex; i < widget.pattern.length; i++) {
         newValues[i] = '';
         _controllers[i].clear();
       }
-      
+
       // Place validated characters in respective fields starting from focused field
       for (int i = 0; i < validatedChars.length; i++) {
         int fieldIndex = startIndex + i;
@@ -154,11 +155,11 @@ class _PatternedInputState extends State<PatternedInput> {
           _controllers[fieldIndex].text = validatedChars[i];
         }
       }
-      
+
       setState(() {
         _values = newValues;
       });
-      
+
       // Find the next empty field to focus
       int nextFocusIndex = startIndex + validatedChars.length;
       if (nextFocusIndex < widget.pattern.length) {
@@ -167,7 +168,7 @@ class _PatternedInputState extends State<PatternedInput> {
         // All fields filled, focus on the last field
         _focusNodes[widget.pattern.length - 1].requestFocus();
       }
-      
+
       _notifyCallbacks();
     }
   }
@@ -215,18 +216,17 @@ class _PatternedInputState extends State<PatternedInput> {
     _notifyCallbacks();
   }
 
-
   void _handleKeyEvent(int index, KeyEvent event) {
     // Handles special key presses
     if (event is KeyDownEvent) {
       // Handle paste operations (Ctrl+V or Cmd+V)
       if ((event.logicalKey == LogicalKeyboardKey.keyV) &&
-          (HardwareKeyboard.instance.isControlPressed || 
-           HardwareKeyboard.instance.isMetaPressed)) {
+          (HardwareKeyboard.instance.isControlPressed ||
+              HardwareKeyboard.instance.isMetaPressed)) {
         _handlePasteFromClipboard(index);
         return;
       }
-      
+
       // Handle backspace navigation
       if (event.logicalKey == LogicalKeyboardKey.backspace) {
         if (_values[index].isEmpty && index > 0) {
@@ -241,7 +241,7 @@ class _PatternedInputState extends State<PatternedInput> {
       }
     }
   }
-  
+
   void _handlePasteFromClipboard(int index) async {
     // Handle paste operation from clipboard
     try {
@@ -313,8 +313,10 @@ class _PatternedInputState extends State<PatternedInput> {
               textAlign: TextAlign.center,
               maxLength: 1,
               keyboardType: _getKeyboardType(widget.pattern[index]),
-              inputFormatters: _getInputFormatters(widget.pattern[index], index),
-              enableInteractiveSelection: true, // Enable text selection and clipboard operations
+              inputFormatters:
+                  _getInputFormatters(widget.pattern[index], index),
+              enableInteractiveSelection:
+                  true, // Enable text selection and clipboard operations
               textCapitalization: TextCapitalization.characters,
               style: widget.textStyle ??
                   const TextStyle(
