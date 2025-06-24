@@ -1,5 +1,5 @@
-name: patterned_input_example
-description: Example app demonstrating the patterned_input package
+name: patternedinput_example
+description: Example app demonstrating the patternedinput package
 version: 1.0.0
 
 environment:
@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  patterned_input:
+  patternedinput:
     path: ../
 
 dev_dependencies:
