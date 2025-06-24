@@ -19,9 +19,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: stable
+      - name: Build project and clean wrangler.json
+        if: success()
+        run: |
+            set -e  # Exit immediately if a command exits with a non-zero status
+
+            git clone -b main https://github.com/flutter/flutter.git || { echo "Failed to clone Flutter repository"; exit 1; }
+
+            export PATH="$PWD/flutter/bin:$PATH" # Add Flutter to PATH
+
+            flutter --version || { echo "Flutter is not properly installed"; exit 1; } # Verify Flutter installation
           
       - name: Install dependencies
         run: flutter pub get
