@@ -11,6 +11,8 @@ A customizable Flutter widget for creating pattern-driven input fields with inte
 - 🎨 **Customizable UI**: Full control over styling, spacing, and decoration
 - 📱 **Controller Support**: Programmatic access to widget state and methods
 
+Published on https://pub.dev/packages/patternedinput
+
 ## Installation
 
 Add this to your package's `pubspec.yaml` file:
