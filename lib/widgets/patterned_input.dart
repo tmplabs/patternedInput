@@ -5,27 +5,30 @@ import 'package:flutter/services.dart';
 class _PasteAwareFormatter extends TextInputFormatter {
   final int fieldIndex;
   final Function(String, int) onPasteDetected;
-  
-  _PasteAwareFormatter({required this.fieldIndex, required this.onPasteDetected});
-  
+
+  _PasteAwareFormatter(
+      {required this.fieldIndex, required this.onPasteDetected});
+
   @override
-  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
     // If more than one character was entered, it's likely a paste operation
     if (newValue.text.length > 1) {
       onPasteDetected(newValue.text, fieldIndex);
       // Return the old value to prevent the multi-character text from being displayed
       return oldValue;
     }
-    
+
     // For single characters, allow normal processing but limit to one character
     if (newValue.text.length <= 1) {
       return newValue;
     }
-    
+
     // Fallback: take only the first character
     return TextEditingValue(
       text: newValue.text.isNotEmpty ? newValue.text[0] : '',
-      selection: TextSelection.collapsed(offset: newValue.text.isNotEmpty ? 1 : 0),
+      selection:
+      TextSelection.collapsed(offset: newValue.text.isNotEmpty ? 1 : 0),
     );
   }
 }
@@ -40,13 +43,13 @@ enum InputType {
 class PatternedInput extends StatefulWidget {
   // Customizable pattern-driven input widget with intelligent validation
   final List<InputType>
-      pattern; // Pattern defining the type of input for each field
+  pattern; // Pattern defining the type of input for each field
 
   final ValueChanged<String>?
-      onChanged; // Callback triggered when any field value changes
+  onChanged; // Callback triggered when any field value changes
 
   final ValueChanged<String>?
-      onComplete; // Callback triggered when all fields are filled
+  onComplete; // Callback triggered when all fields are filled
 
   final InputDecoration? decoration; // Custom decoration for input fields
 
@@ -60,8 +63,10 @@ class PatternedInput extends StatefulWidget {
 
   final bool autoFocus; // Whether to auto-focus the first field
 
+  final List<String>? hints; // Hint text for each field
+
   final PatternedInputController?
-      controller; // Controller to access the widget's state externally
+  controller; // Controller to access the widget's state externally
 
   const PatternedInput({
     super.key,
@@ -74,6 +79,7 @@ class PatternedInput extends StatefulWidget {
     this.fieldWidth = 45.0,
     this.fieldHeight = 45.0,
     this.autoFocus = true,
+    this.hints,
     this.controller,
   });
 
@@ -96,11 +102,11 @@ class _PatternedInputState extends State<PatternedInput> {
   void _initializeControllers() {
     _controllers = List.generate(
       widget.pattern.length,
-      (index) => TextEditingController(),
+          (index) => TextEditingController(),
     );
     _focusNodes = List.generate(
       widget.pattern.length,
-      (index) => FocusNode()..addListener(() {}),
+          (index) => FocusNode()..addListener(() {}),
     );
     _values = List.filled(widget.pattern.length, '');
 
@@ -141,11 +147,13 @@ class _PatternedInputState extends State<PatternedInput> {
     // Step 1: Validate if the string matches the expected pattern from startIndex
     List<String> validatedChars = [];
     int textIndex = 0;
-    
+
     // Pre-validate the string against the pattern starting from startIndex
-    for (int fieldIndex = startIndex; fieldIndex < widget.pattern.length && textIndex < text.length; fieldIndex++) {
+    for (int fieldIndex = startIndex;
+    fieldIndex < widget.pattern.length && textIndex < text.length;
+    fieldIndex++) {
       String? validChar;
-      
+
       // Look for a valid character for this field type in the remaining text
       while (textIndex < text.length) {
         String char = text[textIndex];
@@ -156,24 +164,24 @@ class _PatternedInputState extends State<PatternedInput> {
         }
         textIndex++; // Skip invalid character
       }
-      
+
       if (validChar != null) {
         validatedChars.add(validChar);
       } else {
         break; // No valid character found for this field, stop validation
       }
     }
-    
+
     // Step 2: If validation successful, distribute characters to fields
     if (validatedChars.isNotEmpty) {
       List<String> newValues = List.from(_values);
-      
+
       // Clear fields from start index onwards first
       for (int i = startIndex; i < widget.pattern.length; i++) {
         newValues[i] = '';
         _controllers[i].clear();
       }
-      
+
       // Place validated characters in respective fields starting from focused field
       for (int i = 0; i < validatedChars.length; i++) {
         int fieldIndex = startIndex + i;
@@ -182,11 +190,11 @@ class _PatternedInputState extends State<PatternedInput> {
           _controllers[fieldIndex].text = validatedChars[i];
         }
       }
-      
+
       setState(() {
         _values = newValues;
       });
-      
+
       // Find the next empty field to focus
       int nextFocusIndex = startIndex + validatedChars.length;
       if (nextFocusIndex < widget.pattern.length) {
@@ -195,7 +203,7 @@ class _PatternedInputState extends State<PatternedInput> {
         // All fields filled, focus on the last field
         _focusNodes[widget.pattern.length - 1].requestFocus();
       }
-      
+
       _notifyCallbacks();
     }
   }
@@ -243,18 +251,17 @@ class _PatternedInputState extends State<PatternedInput> {
     _notifyCallbacks();
   }
 
-
   void _handleKeyEvent(int index, KeyEvent event) {
     // Handles special key presses
     if (event is KeyDownEvent) {
       // Handle paste operations (Ctrl+V or Cmd+V)
       if ((event.logicalKey == LogicalKeyboardKey.keyV) &&
-          (HardwareKeyboard.instance.isControlPressed || 
-           HardwareKeyboard.instance.isMetaPressed)) {
+          (HardwareKeyboard.instance.isControlPressed ||
+              HardwareKeyboard.instance.isMetaPressed)) {
         _handlePasteFromClipboard(index);
         return;
       }
-      
+
       // Handle backspace navigation
       if (event.logicalKey == LogicalKeyboardKey.backspace) {
         if (_values[index].isEmpty && index > 0) {
@@ -269,7 +276,7 @@ class _PatternedInputState extends State<PatternedInput> {
       }
     }
   }
-  
+
   void _handlePasteFromClipboard(int index) async {
     // Handle paste operation from clipboard
     try {
@@ -329,7 +336,7 @@ class _PatternedInputState extends State<PatternedInput> {
       spacing: widget.spacing,
       children: List.generate(
         widget.pattern.length,
-        (index) => SizedBox(
+            (index) => SizedBox(
           width: widget.fieldWidth,
           height: widget.fieldHeight,
           child: KeyboardListener(
@@ -341,17 +348,37 @@ class _PatternedInputState extends State<PatternedInput> {
               textAlign: TextAlign.center,
               maxLength: 1,
               keyboardType: _getKeyboardType(widget.pattern[index]),
-              inputFormatters: _getInputFormatters(widget.pattern[index], index),
-              enableInteractiveSelection: true, // Enable text selection and clipboard operations
+              inputFormatters:
+              _getInputFormatters(widget.pattern[index], index),
+              enableInteractiveSelection: true,
+              // Enable text selection and clipboard operations
               textCapitalization: TextCapitalization.characters,
               style: widget.textStyle ??
                   const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
-              decoration: widget.decoration ??
+              decoration: widget.decoration?.copyWith(
+                hintText:
+                widget.hints != null && index < widget.hints!.length
+                    ? widget.hints![index]
+                    : null,
+                hintStyle: widget.decoration?.hintStyle ??
+                    const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
+              ) ??
                   InputDecoration(
                     counterText: '',
+                    hintText:
+                    widget.hints != null && index < widget.hints!.length
+                        ? widget.hints![index]
+                        : null,
+                    hintStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
